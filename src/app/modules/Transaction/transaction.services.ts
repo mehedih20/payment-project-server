@@ -20,13 +20,20 @@ const makeTransactionIntoDb = async (payload: TTransaction) => {
       payload.transactionType === "send-money" ||
       payload.transactionType === "make-payment"
     ) {
-      if ((sender?.balance as number) >= payload.amount) {
-        const newBalance = (sender?.balance as number) - payload.amount;
-        await User.findByIdAndUpdate(sender?._id, { balance: newBalance });
-      }
-      if (receiver) {
-        const newBalance = receiver.balance + payload.amount;
-        await User.findByIdAndUpdate(receiver._id, { balance: newBalance });
+      if (sender && receiver) {
+        if ((sender?.balance as number) >= payload.amount) {
+          const newSenderBalance = (sender?.balance as number) - payload.amount;
+          const senderResponse = await User.findByIdAndUpdate(sender?._id, {
+            balance: newSenderBalance,
+          });
+
+          if (senderResponse) {
+            const newReceiverBalance = receiver.balance + payload.amount;
+            await User.findByIdAndUpdate(receiver._id, {
+              balance: newReceiverBalance,
+            });
+          }
+        }
       }
     }
   }

@@ -3,6 +3,7 @@
 import { ErrorRequestHandler } from "express";
 import mongoose from "mongoose";
 import { ZodError, ZodIssue } from "zod";
+import status from "http-status";
 
 const validationErrorMessageGenerator = (
   err: mongoose.Error.ValidationError,
@@ -28,25 +29,29 @@ const zodErrorMessageGenerator = (err: ZodError): string => {
 };
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  const statusCode = 500;
+  let statusCode = 500;
   let message = "Something went wrong";
   let errorMessage;
 
   if (err instanceof ZodError) {
     //zod error
+    statusCode = status.NOT_ACCEPTABLE;
     message = "Validation Error";
     errorMessage = zodErrorMessageGenerator(err);
   } else if (err?.name === "CastError") {
     //cast error
+    statusCode = status.NO_CONTENT;
     message = "Invalid ID";
     errorMessage = `${JSON.parse(err?.stringValue)} is not a valid ID!`;
   } else if (err?.name === "ValidationError") {
     //mongoose validation error
+    statusCode = status.NOT_ACCEPTABLE;
     message = "Validation Error";
     errorMessage = validationErrorMessageGenerator(err);
   } else if (err?.code === 11000) {
     //duplicate error
     message = "Duplicate key not allowed!";
+    statusCode = status.NOT_ACCEPTABLE;
     const extractingField = Object.keys(err.keyValue)[0];
     errorMessage = `${err?.keyValue[extractingField]} is a duplicate value`;
   } else if (err instanceof Error) {
