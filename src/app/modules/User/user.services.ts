@@ -1,5 +1,6 @@
 import config from "../../config";
-import { TUser, TUserLogin } from "./user.interface";
+import { decodeToken } from "../../utils/decodeToken";
+import { TUpdateUserPin, TUser, TUserLogin } from "./user.interface";
 import { User } from "./user.model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -56,12 +57,40 @@ const loginUserToDb = async (payload: TUserLogin) => {
   };
 };
 
-const getBalanceFromDb = async (email: string) => {
+const getBalanceFromDb = async (token: string) => {
+  const decoded = decodeToken(token);
+
   const result = await User.findOne({
-    email,
+    email: decoded.email,
   }).select("accountNumber balance");
 
   return result;
 };
 
-export { createUserIntoDb, loginUserToDb, getBalanceFromDb };
+const updateUserPinInDB = async (token: string, payload: TUpdateUserPin) => {
+  const decoded = decodeToken(token);
+
+  const hashedPin = await bcrypt.hash(
+    String(payload.pin),
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  const result = await User.findOneAndUpdate(
+    {
+      username: decoded.username,
+    },
+    {
+      $set: { pin: hashedPin },
+    },
+    { new: true },
+  ).select("username updatedAt");
+
+  return result;
+};
+
+export const UserServices = {
+  createUserIntoDb,
+  loginUserToDb,
+  getBalanceFromDb,
+  updateUserPinInDB,
+};

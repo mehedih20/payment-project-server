@@ -1,18 +1,7 @@
 import { Schema, model } from "mongoose";
-import { TUser, TUserLogin } from "./user.interface";
+import { TUser } from "./user.interface";
 import bcrypt from "bcrypt";
 import config from "../../config";
-
-export const userLoginSchema = new Schema<TUserLogin>({
-  username: {
-    type: String,
-    required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-});
 
 const userSchema = new Schema<TUser>(
   {
@@ -48,6 +37,9 @@ const userSchema = new Schema<TUser>(
     photoUrl: {
       type: String,
       required: true,
+    },
+    pin: {
+      type: String,
     },
   },
   {

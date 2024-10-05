@@ -1,12 +1,8 @@
 import catchAsync from "../../utils/catchAsync";
-import {
-  createUserIntoDb,
-  getBalanceFromDb,
-  loginUserToDb,
-} from "./user.services";
+import { UserServices } from "./user.services";
 
 const createUser = catchAsync(async (req, res) => {
-  const result = await createUserIntoDb(req.body);
+  const result = await UserServices.createUserIntoDb(req.body);
 
   res.status(200).json({
     success: true,
@@ -17,7 +13,7 @@ const createUser = catchAsync(async (req, res) => {
 });
 
 const loginUser = catchAsync(async (req, res) => {
-  const result = await loginUserToDb(req.body);
+  const result = await UserServices.loginUserToDb(req.body);
 
   res.status(200).json({
     success: true,
@@ -31,8 +27,8 @@ const loginUser = catchAsync(async (req, res) => {
 });
 
 const getBalance = catchAsync(async (req, res) => {
-  const { email } = req.params;
-  const result = await getBalanceFromDb(email);
+  const token = req.headers.authorization;
+  const result = await UserServices.getBalanceFromDb(token as string);
 
   res.status(200).json({
     success: true,
@@ -42,4 +38,24 @@ const getBalance = catchAsync(async (req, res) => {
   });
 });
 
-export { createUser, loginUser, getBalance };
+const updateUserPin = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+  const result = await UserServices.updateUserPinInDB(
+    token as string,
+    req.body,
+  );
+
+  res.status(200).json({
+    success: true,
+    statusCode: 201,
+    message: "User pin updated successfully",
+    result: result,
+  });
+});
+
+export const UserController = {
+  createUser,
+  loginUser,
+  getBalance,
+  updateUserPin,
+};

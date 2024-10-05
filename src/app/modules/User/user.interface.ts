@@ -7,9 +7,14 @@ export type TUser = {
   photoUrl: string;
   accountNumber: number;
   balance: number;
+  pin: string;
 };
 
 export type TUserLogin = {
   username: string;
   password: string;
+};
+
+export type TUpdateUserPin = {
+  pin: number;
 };
