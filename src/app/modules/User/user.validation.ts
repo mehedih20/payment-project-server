@@ -14,12 +14,18 @@ const userLoginSchemaValidation = z.object({
   password: z.string(),
 });
 
+const setUserPinSchemaValidation = z.object({
+  newPin: z.number(),
+});
+
 const updateUserPinSchemaValidation = z.object({
-  pin: z.number(),
+  oldPin: z.number(),
+  newPin: z.number(),
 });
 
 export {
   userSchemaValidation,
   userLoginSchemaValidation,
+  setUserPinSchemaValidation,
   updateUserPinSchemaValidation,
 };

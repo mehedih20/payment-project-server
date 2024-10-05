@@ -38,6 +38,30 @@ const getBalance = catchAsync(async (req, res) => {
   });
 });
 
+const getUserPinInfo = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+  const result = await UserServices.getUserPinInfoFromDb(token as string);
+
+  res.status(200).json({
+    success: true,
+    statusCode: 201,
+    message: "User pin status fetched successfully",
+    result: result,
+  });
+});
+
+const setUserPin = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+  const result = await UserServices.setUserPinInDB(token as string, req.body);
+
+  res.status(200).json({
+    success: true,
+    statusCode: 201,
+    message: "User pin set successfully",
+    result: result,
+  });
+});
+
 const updateUserPin = catchAsync(async (req, res) => {
   const token = req.headers.authorization;
   const result = await UserServices.updateUserPinInDB(
@@ -57,5 +81,7 @@ export const UserController = {
   createUser,
   loginUser,
   getBalance,
+  getUserPinInfo,
+  setUserPin,
   updateUserPin,
 };

@@ -15,6 +15,11 @@ export type TUserLogin = {
   password: string;
 };
 
+export type TSetUserPin = {
+  newPin: number;
+};
+
 export type TUpdateUserPin = {
-  pin: number;
+  oldPin: number;
+  newPin: number;
 };

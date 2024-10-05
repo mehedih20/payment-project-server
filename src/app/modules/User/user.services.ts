@@ -1,6 +1,11 @@
 import config from "../../config";
 import { decodeToken } from "../../utils/decodeToken";
-import { TUpdateUserPin, TUser, TUserLogin } from "./user.interface";
+import {
+  TSetUserPin,
+  TUpdateUserPin,
+  TUser,
+  TUserLogin,
+} from "./user.interface";
 import { User } from "./user.model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -67,11 +72,67 @@ const getBalanceFromDb = async (token: string) => {
   return result;
 };
 
-const updateUserPinInDB = async (token: string, payload: TUpdateUserPin) => {
+const getUserPinInfoFromDb = async (token: string) => {
   const decoded = decodeToken(token);
 
+  const user = await User.findOne({
+    username: decoded.username,
+  }).select("pin");
+
+  if (user?.pin) {
+    return {
+      pinExist: true,
+    };
+  }
+
+  return {
+    pinExist: false,
+  };
+};
+
+const setUserPinInDB = async (token: string, payload: TSetUserPin) => {
+  const decoded = decodeToken(token);
+  const user = await User.findOne({
+    username: decoded.username,
+  });
+
+  if (user?.pin) {
+    throw new Error("Pin already set");
+  }
+
   const hashedPin = await bcrypt.hash(
-    String(payload.pin),
+    String(payload.newPin),
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  const result = await User.findOneAndUpdate(
+    {
+      username: decoded.username,
+    },
+    {
+      $set: { pin: hashedPin },
+    },
+    { new: true },
+  ).select("username updatedAt");
+
+  return result;
+};
+
+const updateUserPinInDB = async (token: string, payload: TUpdateUserPin) => {
+  const decoded = decodeToken(token);
+  const user = await User.findOne({ username: decoded.username });
+
+  const isPinMatched = await bcrypt.compare(
+    String(payload.oldPin),
+    user?.pin as string,
+  );
+
+  if (!isPinMatched) {
+    throw new Error("Incorrect pin");
+  }
+
+  const hashedPin = await bcrypt.hash(
+    String(payload.newPin),
     Number(config.bcrypt_salt_rounds),
   );
 
@@ -92,5 +153,7 @@ export const UserServices = {
   createUserIntoDb,
   loginUserToDb,
   getBalanceFromDb,
+  getUserPinInfoFromDb,
+  setUserPinInDB,
   updateUserPinInDB,
 };

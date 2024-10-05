@@ -1,6 +1,7 @@
 import { Router } from "express";
 import validateData from "../../middlewares/validateData";
 import {
+  setUserPinSchemaValidation,
   updateUserPinSchemaValidation,
   userLoginSchemaValidation,
   userSchemaValidation,
@@ -21,6 +22,15 @@ router.post(
   UserController.loginUser,
 );
 router.get("/get-balance", auth(), UserController.getBalance);
+
+router.get("/pin-info", auth(), UserController.getUserPinInfo);
+
+router.put(
+  "/set-pin",
+  auth(),
+  validateData(setUserPinSchemaValidation),
+  UserController.setUserPin,
+);
 
 router.put(
   "/update-pin",
