@@ -45,7 +45,7 @@ const loginUserToDb = async (payload: TUserLogin) => {
   }
 
   const jwtPayload = {
-    _id: user?.id,
+    _id: user?._id,
     username: user?.username,
     email: user?.email,
     fullName: `${user?.firstName} ${user?.lastName}`,
