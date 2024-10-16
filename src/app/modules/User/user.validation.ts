@@ -23,9 +23,14 @@ const updateUserPinSchemaValidation = z.object({
   newPin: z.number(),
 });
 
+const verifyUserPinSchemaValidation = z.object({
+  userPin: z.number(),
+});
+
 export {
   userSchemaValidation,
   userLoginSchemaValidation,
   setUserPinSchemaValidation,
   updateUserPinSchemaValidation,
+  verifyUserPinSchemaValidation,
 };

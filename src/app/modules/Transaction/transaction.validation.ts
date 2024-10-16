@@ -1,10 +1,13 @@
 import { z } from "zod";
 
-const transactionSchemaValidation = z.object({
-    amount: z.number(),
-    transactionType : z.enum(["add-money" , "send-money" , "make-payment" , "request-loan"]),
-    receiver: z.string(),
-    transactionMadeBy: z.string()
-})
+const addMoneyValidationSchema = z.object({
+  amount: z.number(),
+});
 
-export {transactionSchemaValidation}
+const sendOrMakePaymentValidationSchema = z.object({
+  amount: z.number(),
+  transactionType: z.enum(["send-money", "make-payment"]),
+  receiver: z.number(),
+});
+
+export { addMoneyValidationSchema, sendOrMakePaymentValidationSchema };

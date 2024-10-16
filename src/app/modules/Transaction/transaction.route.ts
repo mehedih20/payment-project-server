@@ -1,15 +1,26 @@
 import { Router } from "express";
 import validateData from "../../middlewares/validateData";
-import { transactionSchemaValidation } from "./transaction.validation";
-import { getTransactions, makeTransaction } from "./transaction.controller";
+import {
+  addMoneyValidationSchema,
+  sendOrMakePaymentValidationSchema,
+} from "./transaction.validation";
+import { TransactionController } from "./transaction.controller";
+import { auth } from "../../middlewares/auth";
 
 const router = Router();
 
 router.post(
-  "/make-transaction",
-  validateData(transactionSchemaValidation),
-  makeTransaction,
+  "/add-money",
+  auth(),
+  validateData(addMoneyValidationSchema),
+  TransactionController.addMoney,
 );
-router.get("/get-transactions/:username", getTransactions);
+
+router.post(
+  "/send-or-make-payment",
+  auth(),
+  validateData(sendOrMakePaymentValidationSchema),
+  TransactionController.sendOrMakePayment,
+);
 
 export const TransactionRoutes = router;

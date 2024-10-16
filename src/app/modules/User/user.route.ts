@@ -5,6 +5,7 @@ import {
   updateUserPinSchemaValidation,
   userLoginSchemaValidation,
   userSchemaValidation,
+  verifyUserPinSchemaValidation,
 } from "./user.validation";
 import { UserController } from "./user.controller";
 import { auth } from "../../middlewares/auth";
@@ -37,6 +38,13 @@ router.put(
   auth(),
   validateData(updateUserPinSchemaValidation),
   UserController.updateUserPin,
+);
+
+router.post(
+  "/verify-pin",
+  auth(),
+  validateData(verifyUserPinSchemaValidation),
+  UserController.verifyUserPin,
 );
 
 export const UserRoutes = router;

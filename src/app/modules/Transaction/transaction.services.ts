@@ -1,52 +1,112 @@
+import mongoose from "mongoose";
+import { decodeToken } from "../../utils/decodeToken";
 import { User } from "../User/user.model";
 import { TTransaction } from "./transaction.interface";
-import { Transaction } from "./transaction.model";
+import { UserTransaction } from "./transaction.model";
 
-const makeTransactionIntoDb = async (payload: TTransaction) => {
-  const result = await Transaction.create(payload);
-  const sender = await User.findOne({ username: payload.sender });
-  const receiver = await User.findOne({ username: payload.receiver });
-  if (result) {
-    // Add money
-    if (payload.transactionType === "add-money") {
-      if (receiver) {
-        const newBalance = receiver.balance + payload.amount;
-        await User.findByIdAndUpdate(receiver._id, { balance: newBalance });
-      }
+const addMoneyInDb = async (token: string, payload: TTransaction) => {
+  const decoded = decodeToken(token);
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const user = await User.findOne({ email: decoded.email });
+
+    if (!user) {
+      throw new Error("User not found");
     }
 
-    // Send money / Make payment
-    if (
-      payload.transactionType === "send-money" ||
-      payload.transactionType === "make-payment"
-    ) {
-      if (sender && receiver) {
-        if ((sender?.balance as number) >= payload.amount) {
-          const newSenderBalance = (sender?.balance as number) - payload.amount;
-          const senderResponse = await User.findByIdAndUpdate(sender?._id, {
-            balance: newSenderBalance,
-          });
+    const newBalance = user.balance + payload.amount;
 
-          if (senderResponse) {
-            const newReceiverBalance = receiver.balance + payload.amount;
-            await User.findByIdAndUpdate(receiver._id, {
-              balance: newReceiverBalance,
-            });
-          }
-        }
-      }
-    }
+    await User.findByIdAndUpdate(
+      user._id,
+      { balance: newBalance },
+      { new: true, session },
+    );
+
+    const result = await UserTransaction.create(
+      [
+        {
+          amount: payload.amount,
+          transactionType: "add-money",
+        },
+      ],
+      { session },
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return result;
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw new Error("Something went wrong!");
   }
-
-  return result;
 };
 
+const sendOrMakePaymentInDb = async (token: string, payload: TTransaction) => {
+  const decoded = decodeToken(token);
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const user = await User.findOne({ email: decoded.email });
+    const receiver = await User.findOne({ accountNumber: payload.sender });
+
+    if (!user || !receiver) {
+      throw new Error("User or receiver not found");
+    }
+
+    if (payload.amount > user?.balance) {
+      throw new Error("Insufficient balance");
+    }
+
+    const newUserBalance = user?.balance - payload.amount;
+    const newReceiverBalance = receiver?.balance + payload.amount;
+
+    await User.findByIdAndUpdate(
+      user._id,
+      { balance: newUserBalance },
+      { new: true, session },
+    );
+
+    await User.findByIdAndUpdate(
+      receiver?._id,
+      { balance: newReceiverBalance },
+      { new: true, session },
+    );
+
+    const result = await UserTransaction.create(
+      [
+        {
+          amount: payload.amount,
+          transactionType: payload.transactionType,
+          sender: user.accountNumber,
+          receiver: receiver?.accountNumber,
+        },
+      ],
+      { session },
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return result;
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw new Error("Something went wrong!");
+  }
+};
+
+/*
 const getUserTransactionsFromDb = async (username: string) => {
   const result = await Transaction.find({ transactionMadeBy: username });
   const meta = await Transaction.aggregate([
     {
       $match: {
-        transactionMadeBy: username,
+        sender: username,
       },
     },
     {
@@ -61,5 +121,6 @@ const getUserTransactionsFromDb = async (username: string) => {
     result,
   };
 };
+*/
 
-export { makeTransactionIntoDb, getUserTransactionsFromDb };
+export const TransactionServices = { addMoneyInDb, sendOrMakePaymentInDb };

@@ -23,3 +23,7 @@ export type TUpdateUserPin = {
   oldPin: number;
   newPin: number;
 };
+
+export type TVerifyUserPin = {
+  userPin: number;
+};

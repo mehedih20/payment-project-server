@@ -5,6 +5,7 @@ import {
   TUpdateUserPin,
   TUser,
   TUserLogin,
+  TVerifyUserPin,
 } from "./user.interface";
 import { User } from "./user.model";
 import bcrypt from "bcrypt";
@@ -149,6 +150,22 @@ const updateUserPinInDB = async (token: string, payload: TUpdateUserPin) => {
   return result;
 };
 
+const verifyUserPinInDB = async (token: string, payload: TVerifyUserPin) => {
+  const decoded = decodeToken(token);
+  const user = await User.findOne({ username: decoded.username });
+
+  const isPinMatched = await bcrypt.compare(
+    String(payload.userPin),
+    user?.pin as string,
+  );
+
+  if (!isPinMatched) {
+    throw new Error("Incorrect pin");
+  }
+
+  return isPinMatched;
+};
+
 export const UserServices = {
   createUserIntoDb,
   loginUserToDb,
@@ -156,4 +173,5 @@ export const UserServices = {
   getUserPinInfoFromDb,
   setUserPinInDB,
   updateUserPinInDB,
+  verifyUserPinInDB,
 };

@@ -77,6 +77,22 @@ const updateUserPin = catchAsync(async (req, res) => {
   });
 });
 
+const verifyUserPin = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+
+  const result = await UserServices.verifyUserPinInDB(
+    token as string,
+    req.body,
+  );
+
+  res.status(200).json({
+    success: true,
+    statusCode: 201,
+    message: "User pin verified successfully",
+    result: result,
+  });
+});
+
 export const UserController = {
   createUser,
   loginUser,
@@ -84,4 +100,5 @@ export const UserController = {
   getUserPinInfo,
   setUserPin,
   updateUserPin,
+  verifyUserPin,
 };

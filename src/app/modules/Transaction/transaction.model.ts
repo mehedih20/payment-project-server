@@ -9,19 +9,14 @@ const transactionSchema = new Schema<TTransaction>(
     },
     transactionType: {
       type: String,
-      enum: ["add-money", "send-money", "make-payment", "request-loan"],
+      enum: ["add-money", "send-money", "make-payment"],
       required: true,
     },
     sender: {
-      type: String,
+      type: Number,
     },
     receiver: {
-      type: String,
-      required: true,
-    },
-    transactionMadeBy: {
-      type: String,
-      required: true,
+      type: Number,
     },
   },
   {
@@ -29,7 +24,7 @@ const transactionSchema = new Schema<TTransaction>(
   },
 );
 
-export const Transaction = model<TTransaction>(
+export const UserTransaction = model<TTransaction>(
   "Transaction",
   transactionSchema,
 );

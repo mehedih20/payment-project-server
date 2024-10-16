@@ -64,7 +64,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     message,
     errorMessage,
     errorDetails: err,
-    stack: err?.stack,
+    // stack: err?.stack,
   });
 };
 
