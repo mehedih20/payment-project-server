@@ -34,7 +34,7 @@ const getBalance = catchAsync(async (req, res) => {
     success: true,
     statusCode: 201,
     message: "User balance fetched successfully",
-    result: result,
+    result,
   });
 });
 
@@ -93,6 +93,19 @@ const verifyUserPin = catchAsync(async (req, res) => {
   });
 });
 
+const getAllUsers = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+
+  const result = await UserServices.getAllUsersFromDB(token as string);
+
+  res.status(200).json({
+    success: true,
+    statusCode: 201,
+    message: "Users fetched successfully",
+    result: result,
+  });
+});
+
 export const UserController = {
   createUser,
   loginUser,
@@ -101,4 +114,5 @@ export const UserController = {
   setUserPin,
   updateUserPin,
   verifyUserPin,
+  getAllUsers,
 };

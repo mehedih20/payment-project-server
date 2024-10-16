@@ -23,4 +23,10 @@ router.post(
   TransactionController.sendOrMakePayment,
 );
 
+router.get(
+  "/user-transactions",
+  auth(),
+  TransactionController.getUserTransactions,
+);
+
 export const TransactionRoutes = router;

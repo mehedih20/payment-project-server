@@ -47,4 +47,6 @@ router.post(
   UserController.verifyUserPin,
 );
 
+router.get("/users", auth(), UserController.getAllUsers);
+
 export const UserRoutes = router;

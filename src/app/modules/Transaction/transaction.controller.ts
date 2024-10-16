@@ -18,7 +18,7 @@ const addMoney = catchAsync(async (req, res) => {
 
 const sendOrMakePayment = catchAsync(async (req, res) => {
   const token = req.headers.authorization;
-  const result = await TransactionServices.addMoneyInDb(
+  const result = await TransactionServices.sendOrMakePaymentInDb(
     token as string,
     req.body,
   );
@@ -34,4 +34,22 @@ const sendOrMakePayment = catchAsync(async (req, res) => {
   });
 });
 
-export const TransactionController = { addMoney, sendOrMakePayment };
+const getUserTransactions = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+  const result = await TransactionServices.getUserTransactionsFromDb(
+    token as string,
+  );
+
+  res.status(200).json({
+    success: true,
+    statusCode: 201,
+    message: "User transactions fetched successfully",
+    data: result,
+  });
+});
+
+export const TransactionController = {
+  addMoney,
+  sendOrMakePayment,
+  getUserTransactions,
+};

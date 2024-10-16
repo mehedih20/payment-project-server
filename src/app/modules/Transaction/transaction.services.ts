@@ -29,6 +29,7 @@ const addMoneyInDb = async (token: string, payload: TTransaction) => {
         {
           amount: payload.amount,
           transactionType: "add-money",
+          receiver: user.accountNumber,
         },
       ],
       { session },
@@ -52,10 +53,14 @@ const sendOrMakePaymentInDb = async (token: string, payload: TTransaction) => {
 
   try {
     const user = await User.findOne({ email: decoded.email });
-    const receiver = await User.findOne({ accountNumber: payload.sender });
+    const receiver = await User.findOne({ accountNumber: payload.receiver });
 
     if (!user || !receiver) {
       throw new Error("User or receiver not found");
+    }
+
+    if (user.accountNumber === receiver.accountNumber) {
+      throw new Error("Cannot send money to yourself");
     }
 
     if (payload.amount > user?.balance) {
@@ -100,27 +105,24 @@ const sendOrMakePaymentInDb = async (token: string, payload: TTransaction) => {
   }
 };
 
-/*
-const getUserTransactionsFromDb = async (username: string) => {
-  const result = await Transaction.find({ transactionMadeBy: username });
-  const meta = await Transaction.aggregate([
+const getUserTransactionsFromDb = async (token: string) => {
+  const decoded = decodeToken(token);
+
+  const result = await UserTransaction.aggregate([
     {
       $match: {
-        sender: username,
-      },
-    },
-    {
-      $group: {
-        _id: "$transactionType",
-        totalAmount: { $sum: "$amount" },
+        $or: [
+          { sender: Number(decoded?.accountNumber) },
+          { receiver: Number(decoded?.accountNumber) },
+        ],
       },
     },
   ]);
-  return {
-    meta,
-    result,
-  };
+  return result;
 };
-*/
 
-export const TransactionServices = { addMoneyInDb, sendOrMakePaymentInDb };
+export const TransactionServices = {
+  addMoneyInDb,
+  sendOrMakePaymentInDb,
+  getUserTransactionsFromDb,
+};

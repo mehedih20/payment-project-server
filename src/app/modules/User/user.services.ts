@@ -67,8 +67,8 @@ const getBalanceFromDb = async (token: string) => {
   const decoded = decodeToken(token);
 
   const result = await User.findOne({
-    email: decoded.email,
-  }).select("accountNumber balance");
+    _id: decoded._id,
+  }).select("balance");
 
   return result;
 };
@@ -166,6 +166,18 @@ const verifyUserPinInDB = async (token: string, payload: TVerifyUserPin) => {
   return isPinMatched;
 };
 
+const getAllUsersFromDB = async (token: string) => {
+  const decoded = decodeToken(token);
+
+  const result = await User.find({
+    _id: {
+      $ne: decoded._id,
+    },
+  }).select("-password -pin -balance -__v");
+
+  return result;
+};
+
 export const UserServices = {
   createUserIntoDb,
   loginUserToDb,
@@ -174,4 +186,5 @@ export const UserServices = {
   setUserPinInDB,
   updateUserPinInDB,
   verifyUserPinInDB,
+  getAllUsersFromDB,
 };
