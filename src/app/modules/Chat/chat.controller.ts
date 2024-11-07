@@ -30,11 +30,11 @@ const getUserConversations = catchAsync(async (req, res) => {
 });
 
 const checkIfConversationExists = catchAsync(async (req, res) => {
-  const { senderId } = req.params;
+  const { receiverId } = req.params;
   const token = req.headers.authorization;
   const result = await ChatServices.checkIfConversationExistsInDB(
     token as string,
-    senderId,
+    receiverId,
   );
 
   res.status(200).json({

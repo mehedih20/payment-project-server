@@ -20,7 +20,7 @@ router.post(
 router.get("/conversations", auth(), ChatController.getUserConversations);
 
 router.get(
-  "/check-conversation/:senderId",
+  "/check-conversation/:receiverId",
   auth(),
   ChatController.checkIfConversationExists,
 );

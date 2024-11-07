@@ -69,18 +69,18 @@ const getUserConversationsFromDB = async (token: string) => {
 
 const checkIfConversationExistsInDB = async (
   token: string,
-  senderId: string,
+  receiverId: string,
 ) => {
   const decoded = decodeToken(token);
 
   const senderObjectId = new Types.ObjectId(decoded._id);
-  const receiverObjectId = new Types.ObjectId(senderId);
+  const receiverObjectId = new Types.ObjectId(receiverId);
 
   const isConversationExists = await Conversation.findOne({
     participants: { $all: [senderObjectId, receiverObjectId] },
   });
 
-  const result = isConversationExists ? true : false;
+  const result = isConversationExists ? isConversationExists : false;
 
   return result;
 };
