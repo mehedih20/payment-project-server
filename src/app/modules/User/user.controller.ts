@@ -12,6 +12,21 @@ const createUser = catchAsync(async (req, res) => {
   });
 });
 
+const updateUserInfo = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+  const result = await UserServices.updateUserInfoInDb(
+    token as string,
+    req.body,
+  );
+
+  res.status(200).json({
+    success: true,
+    statusCode: 201,
+    message: "User updated successfully",
+    data: result,
+  });
+});
+
 const loginUser = catchAsync(async (req, res) => {
   const result = await UserServices.loginUserToDb(req.body);
 
@@ -108,6 +123,7 @@ const getAllUsers = catchAsync(async (req, res) => {
 
 export const UserController = {
   createUser,
+  updateUserInfo,
   loginUser,
   getBalance,
   getUserPinInfo,

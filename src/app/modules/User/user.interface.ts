@@ -10,6 +10,12 @@ export type TUser = {
   pin: string;
 };
 
+export type TUserUpdate = {
+  firstName?: string;
+  lastName?: string;
+  photoUrl?: string;
+};
+
 export type TUserLogin = {
   username: string;
   password: string;

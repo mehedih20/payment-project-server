@@ -9,6 +9,12 @@ const userSchemaValidation = z.object({
   photoUrl: z.string(),
 });
 
+const updateUserInfoValidation = z.object({
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  photoUrl: z.string().optional(),
+});
+
 const userLoginSchemaValidation = z.object({
   username: z.string(),
   password: z.string(),
@@ -29,6 +35,7 @@ const verifyUserPinSchemaValidation = z.object({
 
 export {
   userSchemaValidation,
+  updateUserInfoValidation,
   userLoginSchemaValidation,
   setUserPinSchemaValidation,
   updateUserPinSchemaValidation,

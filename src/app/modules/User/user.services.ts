@@ -5,6 +5,7 @@ import {
   TUpdateUserPin,
   TUser,
   TUserLogin,
+  TUserUpdate,
   TVerifyUserPin,
 } from "./user.interface";
 import { User } from "./user.model";
@@ -27,6 +28,20 @@ const createUserIntoDb = async (payload: TUser) => {
 
   const createdUser = await User.findById(result._id).select("-password -__v");
   return createdUser;
+};
+
+const updateUserInfoInDb = async (token: string, payload: TUserUpdate) => {
+  const decoded = decodeToken(token);
+
+  const user = await User.findByIdAndUpdate(decoded._id, payload, {
+    new: true,
+  }).select("firstName lastName photoUrl");
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
 };
 
 const loginUserToDb = async (payload: TUserLogin) => {
@@ -180,6 +195,7 @@ const getAllUsersFromDB = async (token: string) => {
 
 export const UserServices = {
   createUserIntoDb,
+  updateUserInfoInDb,
   loginUserToDb,
   getBalanceFromDb,
   getUserPinInfoFromDb,

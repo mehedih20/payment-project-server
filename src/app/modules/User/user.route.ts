@@ -2,6 +2,7 @@ import { Router } from "express";
 import validateData from "../../middlewares/validateData";
 import {
   setUserPinSchemaValidation,
+  updateUserInfoValidation,
   updateUserPinSchemaValidation,
   userLoginSchemaValidation,
   userSchemaValidation,
@@ -17,6 +18,14 @@ router.post(
   validateData(userSchemaValidation),
   UserController.createUser,
 );
+
+router.put(
+  "/update-info",
+  auth(),
+  validateData(updateUserInfoValidation),
+  UserController.updateUserInfo,
+);
+
 router.post(
   "/login",
   validateData(userLoginSchemaValidation),
