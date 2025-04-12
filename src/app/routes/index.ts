@@ -1,11 +1,10 @@
 import { Router } from "express";
 import { UserRoutes } from "../modules/User/user.route";
-import { TransactionRoutes } from "../modules/Transaction/transaction.route";
-import { ChatRoutes } from "../modules/Chat/chat.route";
+import { HistoryRoutes } from "../modules/History/history.route";
 
 const router = Router();
 
-const allModelRoutes = [UserRoutes, TransactionRoutes, ChatRoutes];
+const allModelRoutes = [UserRoutes, HistoryRoutes];
 
 allModelRoutes.forEach((item) => router.use(item));
 

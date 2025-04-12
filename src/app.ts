@@ -14,7 +14,7 @@ app.use(express.json());
 app.use("/api", router);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Payment project running successfully!");
+  res.send("Lungs project running successfully!");
 });
 
 // Global error handler

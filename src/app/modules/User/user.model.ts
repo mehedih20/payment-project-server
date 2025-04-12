@@ -5,40 +5,16 @@ import config from "../../config";
 
 const userSchema = new Schema<TUser>(
   {
-    username: {
+    name: {
       type: String,
       required: true,
-      unique: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
     },
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
     password: {
-      type: String,
-    },
-    accountNumber: {
-      type: Number,
-      unique: true,
-    },
-    balance: {
-      type: Number,
-      default: 0,
-    },
-    photoUrl: {
-      type: String,
-      required: true,
-    },
-    pin: {
       type: String,
     },
   },
